@@ -113,25 +113,24 @@ struct BinaryTreeStaticLayer: View {
                 bitsForRow = 3
             } else {
 
-                let t = Double(row - 3) / Double(rows - 4)   // 0…1
+                let t = Double(row - 3) / Double(rows - 4)
                 let minBits = 4.0
                 let maxBits = 18.0
                 bitsForRow = Int(round(minBits + t * (maxBits - minBits)))
             }
 
-            let jitter = baseJitter + 6 * tRow   // внизу чуть больше хаоса
+            let jitter = baseJitter + 6 * tRow
 
             for col in 0..<bitsForRow {
                 let colNorm: CGFloat
                 if bitsForRow == 1 {
                     colNorm = 0.5
                 } else {
-                    colNorm = CGFloat(col) / CGFloat(bitsForRow - 1)   // 0…1
+                    colNorm = CGFloat(col) / CGFloat(bitsForRow - 1)
                 }
 
                 let baseX = centerX + (colNorm - 0.5) * rowWidth
 
-                // Случайное смещение, чтобы не было сетки
                 let seed = Double(row * 10_000 + col)
                 let jx = (sin(seed * 12.98) * 0.5 + 0.5) * Double(jitter) - Double(jitter) / 2
                 let jy = (sin(seed * 33.21) * 0.5 + 0.5) * Double(jitter) - Double(jitter) / 2
@@ -146,7 +145,6 @@ struct BinaryTreeStaticLayer: View {
         }
     }
 
-    // Отрисовка битов и огоньков
     private func drawBit(
         ctx: GraphicsContext,
         pos: CGPoint,
@@ -156,17 +154,15 @@ struct BinaryTreeStaticLayer: View {
     ) {
 
         let r1 = fract(sin(seed * 1.2345) * 99999.123)
-        let _  = fract(sin(seed * 5.6789) * 54321.987)      // r2 — можно игнорировать
-        let r3 = fract(sin(seed * 9.4321) * 34567.654)      // для огоньков
-        let rBlink = fract(sin(seed * 7.7777) * 123456)     // для мигания
+        let _  = fract(sin(seed * 5.6789) * 54321.987)
+        let r3 = fract(sin(seed * 9.4321) * 34567.654)
+        let rBlink = fract(sin(seed * 7.7777) * 123456)
 
         let bit = r1 > 0.5 ? "1" : "0"
 
-        // Базовый цвет
         let grey = Color.gray.opacity(0.55)
         let neon = Color(red: 0.22, green: 1.0, blue: 0.50)
 
-        // Фликер
         let flick = (sin(time * (1.3 + rBlink * 1.4) + seed) + 1) / 2    // 0..1
         let brightness = (1 - p) * 0.25 + p * (0.3 + flick * 0.7)
 
@@ -174,7 +170,6 @@ struct BinaryTreeStaticLayer: View {
             .mix(with: neon, amount: p)
             .opacity(brightness)
 
-        // --- Огоньки (жёлтые) — оставляем как есть ---
         if r3 > 0.88 && p > 0.05 {
             let lampFlick = (sin(time * (3.0 + r3 * 5.0)) + 1) / 2
             let lampOpacity = 0.4 + lampFlick * 0.6
@@ -193,7 +188,6 @@ struct BinaryTreeStaticLayer: View {
             )
         }
 
-        // Отрисовка цифры
         let text = Text(bit)
             .font(.system(size: 15, weight: .medium, design: .monospaced))
             .foregroundColor(bitColor)
@@ -203,12 +197,6 @@ struct BinaryTreeStaticLayer: View {
 
     private func fract(_ x: Double) -> Double { x - floor(x) }
 }
-
-//
-// MARK: ------------------------------------------------------------
-// MARK: СНЕГ
-// MARK: ------------------------------------------------------------
-//
 
 struct SnowLayer: View {
     let time: TimeInterval
@@ -243,10 +231,6 @@ struct SnowLayer: View {
 
     private func fract(_ x: Double) -> Double { x - floor(x) }
 }
-
-// MARK: ------------------------------------------------------------
-// MARK: Color blending helper
-// ------------------------------------------------------------
 
 extension Color {
     func mix(with other: Color, amount t: Double) -> Color {
